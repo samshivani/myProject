@@ -1,0 +1,786 @@
+import {Component} from 'react'
+import {Redirect} from 'react-router-dom'
+import Cookies from 'js-cookie'
+import './index.css'
+
+class LoginRoute extends Component {
+  state = {username: '', password: '', showError: false, errorMessage: ''}
+
+  enterUsername = event => {
+    this.setState({username: event.target.value})
+  }
+
+  enterPassword = event => {
+    this.setState({password: event.target.value})
+  }
+
+  loginUser = async event => {
+    const {username, password} = this.state
+    event.preventDefault()
+    const userDetails = {username, password}
+    const url = 'https://apis.ccbp.in/login'
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(userDetails),
+    }
+    const response = await fetch(url, options)
+    const data = await response.json()
+    if (response.ok) {
+      this.setState({showError: false})
+      const jwtToken = data.jwt_token
+      Cookies.set('jwt_token', jwtToken, {expires: 30})
+      const {history} = this.props
+      history.replace('/')
+    } else {
+      const errorMessage = data.error_msg
+      this.setState({showError: true, errorMessage})
+    }
+  }
+
+  render() {
+    const {username, password, showError, errorMessage} = this.state
+
+    const jwtToken = Cookies.get('jwt_token')
+    if (jwtToken !== undefined) {
+      return <Redirect to="/" />
+    }
+    return (
+      <div className="page-container">
+        <div className="login-page-container">
+          <img
+            src="https://res.cloudinary.com/dczdoczdr/image/upload/v1665648452/Rectangle_1457_pd62mq.png"
+            className="small-devices-image"
+            alt="website login"
+          />
+          <form className="login-form-container" onSubmit={this.loginUser}>
+            <div className="website-container ">
+              <img
+                src="https://res.cloudinary.com/dczdoczdr/image/upload/v1665670578/Frame_274_1_niavnv.png"
+                alt="website logo"
+                className="website-logo"
+              />
+              <h1 className="tasty-kitchen">Tasty Kitchen</h1>
+              <h1 className="login-heading">Login</h1>
+            </div>
+
+            <label htmlFor="username" className="label-element">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              className="input-element"
+              onChange={this.enterUsername}
+              value={username}
+            />
+            <label htmlFor="password" className="label-element">
+              Password
+            </label>
+            <input
+              id="password"
+              type="text"
+              className="input-element"
+              onChange={this.enterPassword}
+              value={password}
+            />
+            <button type="submit" className="login-button">
+              Login
+            </button>
+            {showError ? (
+              <p className="error-message">*{errorMessage}</p>
+            ) : null}
+          </form>
+          <img
+            src="https://res.cloudinary.com/dczdoczdr/image/upload/v1665647266/Rectangle_1456_wgx6bt.jpg"
+            alt="website login"
+            className="large-devices-image"
+          />
+        </div>
+      </div>
+    )
+  }
+}
+
+export default LoginRoute
+
+========================================================================================================================
+
+
+.login-page-container {
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (min-width: 786px) {
+  .login-page-container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.small-devices-image {
+  height: 40vh;
+  width: 70vw;
+  align-self: flex-end;
+}
+
+@media screen and (min-width: 768px) {
+  .small-devices-image {
+    display: none;
+  }
+}
+
+.large-devices-image {
+  height: 100%;
+  width: 40vw;
+  left: 735px;
+  top: 0px;
+}
+
+@media screen and (max-width: 768px) {
+  .large-devices-image {
+    display: none;
+  }
+}
+
+.website-container {
+  align-self: center;
+  text-align: center;
+}
+
+.tasty-kitchen {
+  height: 32px;
+  font-family: 'Open Sans';
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0px;
+  text-align: left;
+  color: #f7931e;
+}
+
+.login-heading {
+  font-family: 'Open Sans';
+}
+
+.login-form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-right: 17px;
+  width: 40vw;
+  height: 70vh;
+  box-shadow: 0px 8px 40px rgba(7, 7, 7, 0.08);
+  padding: 15px;
+}
+
+@media screen and (max-width: 768px) {
+  .login-form-container {
+    width: 100vw;
+    margin: 9px;
+  }
+}
+
+.website-logo {
+  width: 12vw;
+  height: 13vh;
+}
+
+@media screen and (max-width: 768px) {
+  .website-container {
+    display: none;
+  }
+}
+
+.page-container {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  height: 130vh;
+}
+
+@media screen and (min-width: 768px) {
+  .page-container {
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.label-element {
+  width: 68px;
+  height: 16px;
+  font-size: large;
+  font-family: 'DM Sans';
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #475569;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.input-element {
+  width: 30vw;
+  height: 5vh;
+  border: none;
+  outline: none;
+  background-color: #dde1e7;
+  color: #171f46;
+  padding-left: 5px;
+  font-size: large;
+  font-weight: 500;
+}
+
+@media screen and (max-width: 768px) {
+  .input-element {
+    width: 80vw;
+  }
+}
+
+.login-button {
+  background-color: #f7931e;
+  border: none;
+  width: 80vw;
+  color: #ffffff;
+  font-family: 'Roboto';
+  margin-top: 7px;
+  height: 6vh;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+@media screen and (min-width: 768px) {
+  .login-button {
+    width: 30vw;
+    height: 5vh;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+
+.error-message {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+
+
+==============================================================================================================
+
+---------------------------------NAVBAR------------
+
+
+import {Component} from 'react'
+import Cookies from 'js-cookie'
+import {withRouter, Link} from 'react-router-dom'
+import {GiHamburgerMenu} from 'react-icons/gi'
+import {IoIosCloseCircle} from 'react-icons/io'
+import './index.css'
+
+class Navbar extends Component {
+  state = {showNavBar: false}
+
+  showNavItems = () => {
+    this.setState({showNavBar: true})
+  }
+
+  hideNavBar = () => {
+    this.setState({showNavBar: false})
+  }
+
+  logout = () => {
+    Cookies.remove('jwt_token')
+    const {history} = this.props
+    history.replace('/login')
+  }
+
+  render() {
+    const {showNavBar} = this.state
+    return (
+      <>
+        <nav className="navbar-container">
+          <div className="small-devices-navbar">
+            <Link to="/">
+              <div className="logo-container">
+                <img
+                  src="https://res.cloudinary.com/dczdoczdr/image/upload/v1665670578/Frame_274_1_niavnv.png"
+                  alt="website logo"
+                  className="navbar-image"
+                />
+                <p className="tasty-kitchen">Tasty Kitchen</p>
+              </div>
+            </Link>
+            <button
+              type="button"
+              className="hamburger-button"
+              onClick={this.showNavItems}
+            >
+              <GiHamburgerMenu className="hamburger-icon" />
+            </button>
+          </div>
+          <ul className="nav-items-list">
+            <Link to="/">
+              <li className="home-link">Home</li>
+            </Link>
+            <li className="cart-link">Cart</li>
+            <li>
+              <button
+                type="button"
+                className="logout-button"
+                onClick={this.logout}
+              >
+                Logout
+              </button>
+            </li>
+          </ul>
+        </nav>
+        {showNavBar ? (
+          <div className="toggle-small-devices-navbar">
+            <ul className="small-devices-nav-items-list">
+              <Link to="/">
+                <li className="home-link">Home</li>
+              </Link>
+              <li className="cart-link">Cart</li>
+              <li>
+                <button
+                  type="button"
+                  className="logout-button"
+                  onClick={this.logout}
+                >
+                  Logout
+                </button>
+              </li>
+            </ul>
+            <button
+              type="button"
+              className="hamburger-button"
+              onClick={this.hideNavBar}
+            >
+              <IoIosCloseCircle className="close-icon" />
+            </button>
+          </div>
+        ) : null}
+      </>
+    )
+  }
+}
+
+export default withRouter(Navbar)
+
+================================================================================================================
+
+NAVBAR INDEX.CSS
+
+.navbar-container {
+  background: #f8fafc;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100vw;
+}
+
+@media screen and (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+  }
+}
+
+.navbar-image {
+  width: 8vw;
+  height: 7vh;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.nav-items-list {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 40%;
+  margin-left: auto;
+}
+
+@media screen and (max-width: 768px) {
+  .nav-items-list {
+    display: none;
+  }
+}
+
+.home-link {
+  font-family: 'Open Sans';
+  font-size: large;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: left;
+  color: #f7931e;
+}
+
+.cart-link {
+  font-family: 'Open Sans';
+  font-size: large;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: left;
+  color: #334155;
+}
+
+.logout-button {
+  height: 5vh;
+  width: 10vw;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  color: #ffffff;
+  background-color: #f7931e;
+  border: none;
+  font-family: 'Roboto';
+  border-radius: 6px;
+}
+
+@media screen and (max-width: 768px) {
+  .logout-button {
+    width: 15vw;
+  }
+}
+
+.hamburger-button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+@media screen and (min-width: 768px) {
+  .hamburger-icon {
+    display: none;
+  }
+}
+
+.hamburger-icon {
+  width: 4vw;
+  height: 5vh;
+}
+
+.small-devices-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.small-devices-nav-items-list {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 60%;
+  margin-right: auto;
+  padding-right: 6px;
+}
+
+@media screen and (min-width: 768px) {
+  .small-devices-nav-items-list {
+    display: none;
+  }
+}
+
+.close-icon {
+  width: 5vw;
+  height: 5vh;
+  align-self: flex-end;
+}
+
+.toggle-small-devices-navbar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 10vh;
+  padding-top: 2%;
+}
+
+=====================================================================================================
+
+PROTECTED ROUTE-------------------------------
+
+import Cookies from 'js-cookie'
+import {Redirect, Route} from 'react-router-dom'
+
+const ProtectedRoute = props => {
+  const jwtToken = Cookies.get('jwt_token')
+  if (jwtToken === undefined) {
+    return <Redirect to="/login" />
+  }
+  return <Route {...props} />
+}
+
+export default ProtectedRoute
+
+==============================================================================================================
+
+APP.JS--------------------------------///////
+
+import {Switch, Route} from 'react-router-dom'
+import './App.css'
+import LoginRoute from './components/loginForm'
+import ProtectedRoute from './components/ProtectedRoute'
+import Home from './components/Home'
+
+/* const sortByOptions = [
+  {
+    id: 0,
+    displayText: 'Highest',
+    value: 'Highest',
+  },
+  {
+    id: 2,
+    displayText: 'Lowest',
+    value: 'Lowest',
+  },
+]
+ */
+
+const App = () => (
+  <Switch>
+    <Route exact path="/login" component={LoginRoute} />
+    <ProtectedRoute exact path="/" component={Home} />
+  </Switch>
+)
+
+export default App
+
+=============================================================================================================
+
+
+HOME/////
+
+import {Component} from 'react'
+import Cookies from 'js-cookie'
+import {MdOutlineSort} from 'react-icons/md'
+import 'slick-carousel/slick/slick.css'
+import 'slick-carousel/slick/slick-theme.css'
+import OffersSlider from '../OffersSection'
+
+import './index.css'
+import Navbar from '../Navbar'
+
+class Home extends Component {
+  state = {sliderImages: []}
+
+  componentDidMount() {
+    this.getOffers()
+  }
+
+  getOffers = async () => {
+    const url = 'https://apis.ccbp.in/restaurants-list/offers'
+    const jwtToken = Cookies.get('jwt_token')
+    const options = {
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${jwtToken}`,
+      },
+    }
+    const response = await fetch(url, options)
+    const data = await response.json()
+    const offersData = data.offers.map(each => ({
+      id: each.id,
+      imageUrl: each.image_url,
+    }))
+    this.setState({sliderImages: offersData})
+  }
+
+  renderSlider = props => (
+    <div>
+      <img src={props.imageUrl} alt="name" />
+    </div>
+  )
+
+  render() {
+    console.log(this.props)
+
+    const {sliderImages} = this.state
+    return (
+      <div className="home-page-container">
+        <Navbar />
+        <div className="slider-container">
+          <OffersSlider details={sliderImages} />
+        </div>
+        <div className="sort-by-container">
+          <div className="description-container">
+            <h1 className="home-page-main-heading">Popular Restaurants</h1>
+            <p className="home-page-paragraph">
+              Select Your favourite restaurant special dish and make your day
+              happy...
+            </p>
+          </div>
+          <MdOutlineSort className="sort-by-icon" />
+        </div>
+      </div>
+    )
+  }
+}
+
+export default Home
+
+/* <select>
+            {sortByOptions.map(each => (
+              <option value={each.value} key={each.id}>
+                {each.displayText}
+              </option>
+            ))}
+          </select>
+*/
+
+========================================================================================================================
+
+
+.home-page-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.slider-container {
+  width: 100vw;
+  height: 30vh;
+}
+
+.home-page-main-heading {
+  height: 32px;
+  left: 24px;
+  top: 276px;
+  color: #183b56;
+}
+
+@media screen and (min-width: 768px) {
+  .home-page-main-heading {
+    height: 48px;
+  }
+}
+
+.home-page-paragraph {
+  font-family: 'Open Sans';
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: left;
+  color: #183b56;
+}
+
+@media screen and (min-width: 768px) {
+  .home-page-paragraph {
+    left: 165px;
+    width: 50vw;
+    top: 120px;
+    font-size: 17px;
+  }
+}
+
+.sort-by-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 10px;
+}
+
+@media screen and (min-width: 768px) {
+  .sort-by-container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.sort-by-icon {
+  width: 4vw;
+  height: 5vh;
+  color: #475569;
+  font-weight: 600;
+}
+
+
+==========================================================================================================================
+
+----------------------------------------\\\\\\\  OffersSection   /////
+
+import Slider from 'react-slick'
+import OfferItem from '../OfferItem'
+import 'slick-carousel/slick/slick.css'
+import 'slick-carousel/slick/slick-theme.css'
+
+const OffersSlider = props => {
+  const {details} = props
+  const settings = {
+    slidesToScroll: 1,
+    dots: true,
+    autoplay: true,
+  }
+
+  return (
+    <>
+      <Slider {...settings}>
+        {details.map(each => (
+          <OfferItem offer={each} key={each.id} />
+        ))}
+      </Slider>
+    </>
+  )
+}
+
+export default OffersSlider
+=================================================================================================================
+
+---------------------------------------------------OffersItem---------------------------------
+
+import './index.css'
+
+const OfferItem = props => {
+  const {offer} = props
+  return (
+    <div>
+      <img src={offer.imageUrl} alt={offer.id} className="image" />
+    </div>
+  )
+}
+
+export default OfferItem
+
+===========================================================================================
+
+.image {
+  width: 80vw;
+  height: 30vh;
+  border-radius: 9px;
+  left: 7vw;
+  right: 7vw;
+  margin: auto;
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .image {
+    width: 99vw;
+  }
+}
+.slick-dots {
+  height: 18px;
+  width: 120px;
+  margin-left: 37vw;
+  border-radius: 0px;
+}
+
+
+===================================================================================================
+
